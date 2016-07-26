@@ -118,8 +118,23 @@ export default class Agent {
 		});
 	}
 
-	_buildRequest({uri, method, data, auth, query, form, files, makerequest=request}) {
+	/**
+	 * Build a request
+	 * @param {String} uri           The URI to request
+	 * @param {String} method        The method used to request the URI, should be in uppercase.
+	 * @param {String} data          Arbitrary data to send as the body.
+	 * @param {Object} auth          Authorization
+	 * @param {String} query         Query parameters
+	 * @param {Object} form          Form fields
+	 * @param {Object} files         array of file names and file content
+	 * @param {function} makerequest Reference to request module
+	 * @private
+	 */
+	_buildRequest({uri, method, data, auth, query, form = {}, files = {}, makerequest = request}) {
 		const req = makerequest(method, uri);
+		const fileEntries = Object.entries(files);
+		const formEntries = Object.entries(form);
+
 		if (this.prefix) {
 			req.use(this.prefix);
 		}
@@ -127,16 +142,16 @@ export default class Agent {
 		if (query) {
 			req.query(query);
 		}
-		if (files) {
-			for (let [name, file] of Object.entries(files)) {
+		if (fileEntries.length > 0) {
+			for (let [name, file] of fileEntries) {
 				req.attach(name, file.data, file.path);
 			}
-			if (form) {
-				for (let [name, value] of Object.entries(form)) {
+			if (formEntries.length > 0) {
+				for (let [name, value] of formEntries) {
 					req.field(name, value);
 				}
 			}
-		} else if (form) {
+		} else if (formEntries.length > 0) {
 			req.type('form');
 			req.send(form);
 		} else if (data) {
