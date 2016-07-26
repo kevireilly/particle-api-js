@@ -35,14 +35,18 @@ class Particle {
 	 * @return {Promise}
 	 */
 	login({ username, password, tokenDuration = this.tokenDuration }) {
-		return this.request({ uri: '/oauth/token', form: {
-			username,
-			password,
-			grant_type: 'password',
-			client_id: this.clientId,
-			client_secret: this.clientSecret,
-			expires_in: tokenDuration,
-		}});
+		return this.request({
+			uri: '/oauth/token',
+			method: 'post',
+			form: {
+				username,
+				password,
+				grant_type: 'password',
+				client_id: this.clientId,
+				client_secret: this.clientSecret,
+				expires_in: tokenDuration
+			}
+		});
 	}
 
 	/**
